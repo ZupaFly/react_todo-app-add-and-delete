@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState, useEffect, useRef } from 'react';
 import { getTodos, uploadTodo, deleteTodo } from './api/todos';
 import { USER_ID } from './api/todos';
@@ -180,9 +181,26 @@ export const App: React.FC = () => {
         />
 
         {tempTodo && (
-          <div className="todo temp-todo" data-cy="TempTodo">
-            <div className="loader"></div>
+          <div
+            className={classNames('todo', 'temp-todo', { 'is-active': true })}
+            data-cy="TempTodo"
+          >
+            <label className="todo__status-label">
+              <input
+                type="checkbox"
+                className="todo__status"
+                disabled
+                checked={tempTodo.completed}
+              />
+            </label>
             <span className="todo__title">{tempTodo.title}</span>
+            <button
+              type="button"
+              className="todo__remove"
+              disabled
+              aria-label="Remove todo"
+            />
+            <div className="loader" />
           </div>
         )}
 
