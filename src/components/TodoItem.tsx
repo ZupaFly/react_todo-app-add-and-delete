@@ -52,7 +52,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
         className="todo__remove"
         data-cy="TodoDelete"
         onClick={handleDelete}
-        disabled={haveId.includes(todo.id)} // Disable button during loader
+        disabled={haveId.includes(todo.id)}
       >
         ×
       </button>
