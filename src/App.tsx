@@ -17,6 +17,7 @@ export const App: React.FC = () => {
   const [newTodoTitle, setNewTodoTitle] = useState('');
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [haveId, sethaveId] = useState<number[]>([]);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -79,7 +80,7 @@ export const App: React.FC = () => {
         title: title.trim(),
         completed: false,
         userId: USER_ID,
-        deleting: 'idle', // Include deleting state
+        deleting: 'idle',
       });
 
       setTodos(prevTodos => [...prevTodos, newTodo]);
@@ -89,13 +90,16 @@ export const App: React.FC = () => {
     } catch {
       setError('Unable to add a todo');
       setTempTodo(null);
-      setNewTodoTitle(title); // Keep the title in case of error
+      setNewTodoTitle(title);
     } finally {
       setIsSubmitting(false);
+      setLoading(false);
+      setTempTodo(null);
     }
   };
 
   const handleDeleteTodo = async (todoId: number) => {
+    sethaveId(prev => [...prev, todoId]);
     try {
       setTodos(prevTodos =>
         prevTodos.map(todo =>
@@ -115,11 +119,15 @@ export const App: React.FC = () => {
       );
     } finally {
       inputRef.current?.focus();
+      setLoading(false);
+      sethaveId(prev => prev.filter(id => id !== todoId));
     }
   };
 
   const handleClearCompleted = async () => {
     const completedTodos = todos.filter(todo => todo.completed);
+
+    sethaveId(completedTodos.map(todo => todo.id));
     const deletePromises = completedTodos.map(todo => deleteTodo(todo.id));
 
     try {
@@ -127,6 +135,8 @@ export const App: React.FC = () => {
       setTodos(prevTodos => prevTodos.filter(todo => !todo.completed));
     } catch {
       setError('Unable to delete completed todos');
+    } finally {
+      sethaveId([]);
     }
   };
 
@@ -175,34 +185,11 @@ export const App: React.FC = () => {
 
         <TodoList
           todos={filteredTodos}
-          loading={loading}
+          tempTodo={tempTodo}
+          haveId={haveId}
           setTodos={setTodos}
           onDeleteTodo={handleDeleteTodo}
         />
-
-        {tempTodo && (
-          <div
-            className={classNames('todo', 'temp-todo', { 'is-active': true })}
-            data-cy="TempTodo"
-          >
-            <label className="todo__status-label">
-              <input
-                type="checkbox"
-                className="todo__status"
-                disabled
-                checked={tempTodo.completed}
-              />
-            </label>
-            <span className="todo__title">{tempTodo.title}</span>
-            <button
-              type="button"
-              className="todo__remove"
-              disabled
-              aria-label="Remove todo"
-            />
-            <div className="loader" />
-          </div>
-        )}
 
         {todos.length > 0 && (
           <Footer
@@ -210,6 +197,7 @@ export const App: React.FC = () => {
             filter={filter}
             onFilterChange={setFilter}
             onClearCompleted={handleClearCompleted}
+            haveId={haveId}
           />
         )}
       </div>

@@ -5,12 +5,14 @@ import classNames from 'classnames';
 
 interface TodoItemProps {
   todo: Todo;
+  haveId: number[];
   setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
   onDeleteTodo: (todoId: number) => void;
 }
 
 const TodoItem: React.FC<TodoItemProps> = ({
   todo,
+  haveId,
   setTodos,
   onDeleteTodo,
 }) => {
@@ -44,18 +46,26 @@ const TodoItem: React.FC<TodoItemProps> = ({
       <span className="todo__title" data-cy="TodoTitle">
         {todo.title}
       </span>
-      {todo.deleting ? (
-        <div className="loader" data-cy="TodoLoader"></div>
-      ) : (
-        <button
-          type="button"
-          className="todo__remove"
-          data-cy="TodoDelete"
-          onClick={handleDelete}
-        >
-          ×
-        </button>
-      )}
+
+      <button
+        type="button"
+        className="todo__remove"
+        data-cy="TodoDelete"
+        onClick={handleDelete}
+        disabled={haveId.includes(todo.id)} // Disable button during loader
+      >
+        ×
+      </button>
+
+      <div
+        data-cy="TodoLoader"
+        className={classNames('modal overlay', {
+          'is-active': haveId.includes(todo.id),
+        })}
+      >
+        <div className="modal-background has-background-white-ter" />
+        <div className="loader" />
+      </div>
     </div>
   );
 };

@@ -8,6 +8,7 @@ interface FooterProps {
   filter: string;
   onFilterChange: (filter: string) => void;
   onClearCompleted: () => void;
+  haveId: number[];
 }
 
 const Footer: React.FC<FooterProps> = ({

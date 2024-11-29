@@ -1,36 +1,39 @@
 import React from 'react';
 import { Todo } from '../types/Todo';
 import TodoItem from './TodoItem';
+import { TempTodo } from './TempTodo';
 
 interface TodoListProps {
   todos: Todo[];
-  loading: boolean;
+  tempTodo: Todo | null;
+  haveId: number[];
   setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
   onDeleteTodo: (todoId: number) => void;
 }
 
 const TodoList: React.FC<TodoListProps> = ({
   todos,
-  loading,
+  tempTodo,
+  haveId,
   setTodos,
   onDeleteTodo,
 }) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">
-      {loading ? (
-        <div>
-          <div className="loader"></div>
-          <div className="loading">Loading...</div>
+      {todos.map(todo => (
+        <TodoItem
+          key={todo.id}
+          todo={todo}
+          haveId={haveId}
+          setTodos={setTodos}
+          onDeleteTodo={onDeleteTodo}
+        />
+      ))}
+
+      {tempTodo && (
+        <div key="temp" className="temp-item">
+          <TempTodo tempTitle={tempTodo.title} />
         </div>
-      ) : (
-        todos.map(todo => (
-          <TodoItem
-            key={todo.id}
-            todo={todo}
-            setTodos={setTodos}
-            onDeleteTodo={onDeleteTodo}
-          />
-        ))
       )}
     </section>
   );
